@@ -1,6 +1,7 @@
 name: Create PR with GHA Test Update
 
 on:
+  workflow_dispatch:
   repository_dispatch:
     types: [update-gha-test]
 
