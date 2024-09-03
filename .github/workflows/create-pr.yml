@@ -1,0 +1,28 @@
+name: Create PR with GHA Test Update
+
+on:
+  repository_dispatch:
+    types: [update-gha-test]
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Update GHA Test file
+        run: |
+          echo -e "\n\nLast updated: $(date '+%Y-%m-%d %H:%M:%S')" >> gha-test.md
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update GHA Test file with current time
+          title: 'Update GHA Test file with current time'
+          body: |
+            This PR updates the gha-test.md file with the current time.
+            Last updated: ${{ steps.date.outputs.date }}
+          branch: update-gha-test-${{ github.run_number }}
+          base: main
