@@ -7,12 +7,33 @@ jobs:
   create-pr:
     runs-on: ubuntu-latest
     steps:
+      - name: Check PAT
+        run: |
+          if [ -n "${{ secrets.PAT }}" ]; then
+            echo "PAT is set"
+          else
+            echo "PAT is not set"
+            exit 1
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}  # ここにPATを追加
 
       - name: Update gha-test.md with current time
         run: |
           echo "$(date +'%Y-%m-%d-%H:%M')" >> gha-test.md
+
+      - name: Test PAT validity
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token ${{ secrets.PAT }}" https://api.github.com/user)
+          if [ $response -eq 200 ]; then
+            echo "PAT is valid"
+          else
+            echo "PAT is invalid or has insufficient permissions"
+            exit 1
+          fi
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
