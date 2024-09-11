@@ -1,0 +1,26 @@
+name: Create Pull Request with Time Update
+
+on:
+  workflow_dispatch:  # GitHub上のGUIからトリガー可能
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Update gha-test.md with current time
+        run: |
+          echo "$(date +'%Y-%m-%d-%H:%M')" >> gha-test.md
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update gha-test.md with current time
+          title: Update gha-test.md
+          body: |
+            This PR updates gha-test.md with the current time.
+            Time added: $(date +'%Y-%m-%d-%H:%M')
+          branch: update-gha-test-time
