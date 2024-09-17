@@ -26,26 +26,26 @@ jobs:
           node fetchNotion.js "$NOTION_API_KEY" "$NOTION_DB_ID"
           node makeMarkdown.js "$NOTION_API_KEY"
 
-      - name: Read updated page titles
-        id: read_titles
+      - name: Get changed files
+        id: changed_files
         run: |
-          if [ -f updated_titles.txt ]; then
-            UPDATED_TITLES=$(cat updated_titles.txt)
-            echo "UPDATED_TITLES<<EOF" >> $GITHUB_OUTPUT
-            echo "$UPDATED_TITLES" >> $GITHUB_OUTPUT
+          git add .
+          git diff --cached --name-only > changed_files.txt
+          if [ -s changed_files.txt ]; then
+            echo "CHANGED_FILES<<EOF" >> $GITHUB_OUTPUT
+            cat changed_files.txt >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
           else
-            echo "UPDATED_TITLES=No pages were updated" >> $GITHUB_OUTPUT
+            echo "CHANGED_FILES=No files were changed" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.PAT }}
-          commit-message: Update gha-test.md with API data
-          title: Update gha-test.md with API data
+          commit-message: Update files with API data
+          title: Update files with API data
           body: |
-
-            Updated pages:
-            ${{ steps.read_titles.outputs.UPDATED_TITLES }}
-          branch: update-gha-test-api-data
+            Updated files:
+            ${{ steps.changed_files.outputs.CHANGED_FILES }}
+          branch: update-api-data
