@@ -66,8 +66,8 @@ async function processPage(page) {
   const mdString = n2m.toMarkdownString(mdblocks);
   const contentToWrite = extractMarkdownContent(mdString);
   const finalContent = typeof contentToWrite === 'string' ? contentToWrite : JSON.stringify(contentToWrite, null, 2);
-  const filePath = path.join(CONFIG.OUTPUT_DIR, `${page.id}.md`);
-  await fs.writeFile(filePath, finalContent);
+  const outputPath = path.join(process.cwd(), 'notion', `${page.title}.md`);
+  await fs.writeFile(outputPath, finalContent);
   console.log(`Markdown saved for page: ${page.title}`);
 }
 
