@@ -1,0 +1,17 @@
+{
+  "name": "document-with-notion",
+  "version": "1.0.0",
+  "description": "## 概要 このリポジトリとNotionの内容を同期させるため、Notion APIを使用して差分を検出し、自動的にプルリクエストを作成する",
+  "main": "fetchNotionPages.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "notion-to-md": "^3.1.1"
+  }
+}
