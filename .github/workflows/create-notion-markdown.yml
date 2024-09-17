@@ -26,6 +26,14 @@ jobs:
           node fetchNotion.js "$NOTION_API_KEY" "$NOTION_DB_ID"
           node makeMarkdown.js "$NOTION_API_KEY"
 
+      - name: Read updated page titles
+        id: read_titles
+        run: |
+          UPDATED_TITLES=$(cat updated_titles.txt)
+          echo "UPDATED_TITLES<<EOF" >> $GITHUB_OUTPUT
+          echo "$UPDATED_TITLES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
@@ -33,6 +41,7 @@ jobs:
           commit-message: Update gha-test.md with API data
           title: Update gha-test.md with API data
           body: |
-            This PR updates gha-test.md with the current API data.
-            Time added: $(date +'%Y-%m-%d-%H:%M')
+
+            Updated pages:
+            ${{ steps.read_titles.outputs.UPDATED_TITLES }}
           branch: update-gha-test-api-data
