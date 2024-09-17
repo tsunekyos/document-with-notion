@@ -29,10 +29,14 @@ jobs:
       - name: Read updated page titles
         id: read_titles
         run: |
-          UPDATED_TITLES=$(cat updated_titles.txt)
-          echo "UPDATED_TITLES<<EOF" >> $GITHUB_OUTPUT
-          echo "$UPDATED_TITLES" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          if [ -f updated_titles.txt ]; then
+            UPDATED_TITLES=$(cat updated_titles.txt)
+            echo "UPDATED_TITLES<<EOF" >> $GITHUB_OUTPUT
+            echo "$UPDATED_TITLES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "UPDATED_TITLES=No pages were updated" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
