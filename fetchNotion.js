@@ -1,11 +1,13 @@
 const fs = require('node:fs');
 const axios = require('axios');
-require('dotenv').config();
 
-const NOTION_SECRET = process.env.NOTION_SECRET;
-const NOTION_DB_ID = process.env.NOTION_DB_ID;
+const [NOTION_SECRET, NOTION_DB_ID] = process.argv.slice(2);
 
 async function fetchNotionPages() {
+  if (!NOTION_SECRET || !NOTION_DB_ID) {
+    throw new Error('NOTION_SECRET and NOTION_DB_ID must be provided');
+  }
+
   try {
     const response = await axios.post(
       `https://api.notion.com/v1/databases/${NOTION_DB_ID}/query`,
@@ -29,8 +31,18 @@ async function fetchNotionPages() {
     console.log('Page list saved to page-list.json');
     console.log(JSON.stringify(pages, null, 2));
   } catch (error) {
-    console.error('Error fetching Notion pages:', error.message);
+    if (error.response) {
+      console.error('Error response:', error.response.data);
+    }
+    throw error;
   }
 }
 
-fetchNotionPages();
+(async () => {
+  try {
+    await fetchNotionPages();
+  } catch (error) {
+    console.error('Error:', error.message);
+    process.exit(1);
+  }
+})();

@@ -1,4 +1,4 @@
-name: Create Pull Request with Time Update
+name: Create Pull Request with API Data
 
 on:
   workflow_dispatch:  # GitHub上のGUIからトリガー可能
@@ -7,41 +7,32 @@ jobs:
   create-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Check PAT
-        run: |
-          if [ -n "${{ secrets.PAT }}" ]; then
-            echo "PAT is set"
-          else
-            echo "PAT is not set"
-            exit 1
-          fi
-
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          token: ${{ secrets.PAT }}  # ここにPATを追加
+          node-version: '14'
 
-      - name: Update gha-test.md with current time
-        run: |
-          echo "$(date +'%Y-%m-%d-%H:%M')" >> gha-test.md
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Test PAT validity
+      - name: Fetch Notion data and create Markdown
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token ${{ secrets.PAT }}" https://api.github.com/user)
-          if [ $response -eq 200 ]; then
-            echo "PAT is valid"
-          else
-            echo "PAT is invalid or has insufficient permissions"
-            exit 1
-          fi
+          node fetchNotion.js "$NOTION_API_KEY" "$NOTION_DB_ID"
+          node makeMarkdown.js
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.PAT }}
-          commit-message: Update gha-test.md with current time
-          title: Update gha-test.md
+          commit-message: Update gha-test.md with API data
+          title: Update gha-test.md with API data
           body: |
-            This PR updates gha-test.md with the current time.
+            This PR updates gha-test.md with the current API data.
             Time added: $(date +'%Y-%m-%d-%H:%M')
-          branch: update-gha-test-time
+          branch: update-gha-test-api-data
