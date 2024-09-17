@@ -24,7 +24,7 @@ jobs:
           NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
         run: |
           node fetchNotion.js "$NOTION_API_KEY" "$NOTION_DB_ID"
-          node makeMarkdown.js
+          node makeMarkdown.js "$NOTION_API_KEY"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3

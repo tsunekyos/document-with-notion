@@ -2,7 +2,13 @@ const { Client } = require("@notionhq/client");
 const { NotionToMarkdown } = require("notion-to-md");
 const fs = require('node:fs').promises;
 const path = require('node:path');
-require('dotenv').config();
+
+// コマンドライン引数の処理を追加
+const notionApiKey = process.argv[2];
+if (!notionApiKey) {
+  console.error('Notion API キーが指定されていません。');
+  process.exit(1);
+}
 
 // 設定
 const CONFIG = {
@@ -10,8 +16,8 @@ const CONFIG = {
   PAGE_LIST_FILE: 'page-list.json'
 };
 
-// Notionクライアントの初期化
-const notion = new Client({ auth: process.env.NOTION_SECRET });
+// Notionクライアントの初期化を修正
+const notion = new Client({ auth: notionApiKey });
 const n2m = new NotionToMarkdown({ 
   notionClient: notion,
   config: { separateChildPage: true }
